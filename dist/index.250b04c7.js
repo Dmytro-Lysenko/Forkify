@@ -140,9 +140,9 @@
       this[globalName] = mainExports;
     }
   }
-})({"1Mcyf":[function(require,module,exports) {
+})({"7BONy":[function(require,module,exports) {
 var HMR_HOST = null;
-var HMR_PORT = 34499;
+var HMR_PORT = 1234;
 var HMR_SECURE = false;
 var HMR_ENV_HASH = "d751713988987e9331980363e24189ce";
 module.bundle.HMR_BUNDLE_ID = "6315ebf922a29661e8263da0250b04c7";
@@ -442,6 +442,8 @@ id) /*: string*/
 }
 
 },{}],"3miIZ":[function(require,module,exports) {
+var _modelJs = require('./model.js');
+require('./views/recipeView.js');
 var _urlImgIconsSvg = require('url:../img/icons.svg');
 var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
 var _urlImgIconsSvgDefault = _parcelHelpers.interopDefault(_urlImgIconsSvg);
@@ -473,25 +475,12 @@ const showRecipe = async function () {
     const id = window.location.hash.slice(1);
     console.log(id);
     if (!id) return;
-    // 1) Loading recipy
     renderSpinner(recipeContainer);
-    const res = await fetch(// 'https://forkify-api.herokuapp.com/api/v2/recipes/5ed6604591c37cdc054bc886'
-    `https://forkify-api.herokuapp.com/api/v2/recipes/${id}`);
-    const data = await res.json();
-    if (!res.ok) throw new Error(`${data.message} (${res.status})`);
-    let recipe = data.data.recipe;
-    recipe = {
-      id: recipe.id,
-      title: recipe.title,
-      publisher: recipe.publisher,
-      sourceUrl: recipe.source_url,
-      image: recipe.image_url,
-      servings: recipe.servings,
-      cookingTime: recipe.cooking_time,
-      ingredients: recipe.ingredients
-    };
-    console.log(recipe);
+    // 1) Loading recipy
+    await _modelJs.loadRecipe(id);
+    const recipe = _modelJs.state.recipe;
     // 2) Rendering recipe
+    // 
     const markup = `
     <figure class="recipe__fig">
           <img src="${recipe.image}" alt="${recipe.title}" class="recipe__img" />
@@ -587,7 +576,7 @@ const showRecipe = async function () {
 };
 ['hashchange', 'load'].forEach(ev => window.addEventListener(ev, showRecipe));
 
-},{"url:../img/icons.svg":"3t5dV","core-js/stable":"1PFvP","regenerator-runtime/runtime":"62Qib","@parcel/transformer-js/lib/esmodule-helpers.js":"5gA8y"}],"3t5dV":[function(require,module,exports) {
+},{"url:../img/icons.svg":"3t5dV","core-js/stable":"1PFvP","regenerator-runtime/runtime":"62Qib","@parcel/transformer-js/lib/esmodule-helpers.js":"5gA8y","./model.js":"1hp6y","./views/recipeView.js":"9e6b9"}],"3t5dV":[function(require,module,exports) {
 module.exports = require('./bundle-url').getBundleURL() + "icons.d4a14980.svg"
 },{"./bundle-url":"3seVR"}],"3seVR":[function(require,module,exports) {
 "use strict";
@@ -12588,6 +12577,56 @@ exports.export = function (dest, destName, get) {
     get: get
   });
 };
-},{}]},["1Mcyf","3miIZ"], "3miIZ", "parcelRequirefade")
+},{}],"1hp6y":[function(require,module,exports) {
+var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
+_parcelHelpers.defineInteropFlag(exports);
+_parcelHelpers.export(exports, "state", function () {
+  return state;
+});
+_parcelHelpers.export(exports, "loadRecipe", function () {
+  return loadRecipe;
+});
+require('regenerator-runtime');
+const state = {
+  recipe: {}
+};
+const loadRecipe = async function (id) {
+  try {
+    const res = await fetch(// 'https://forkify-api.herokuapp.com/api/v2/recipes/5ed6604591c37cdc054bc886'
+    `https://forkify-api.herokuapp.com/api/v2/recipes/${id}`);
+    const data = await res.json();
+    if (!res.ok) throw new Error(`${data.message} (${res.status})`);
+    const {recipe} = data.data;
+    state.recipe = {
+      id: recipe.id,
+      title: recipe.title,
+      publisher: recipe.publisher,
+      sourceUrl: recipe.source_url,
+      image: recipe.image_url,
+      servings: recipe.servings,
+      cookingTime: recipe.cooking_time,
+      ingredients: recipe.ingredients
+    };
+    console.log(state.recipe);
+  } catch (err) {
+    alert(err);
+  }
+};
+
+},{"regenerator-runtime":"62Qib","@parcel/transformer-js/lib/esmodule-helpers.js":"5gA8y"}],"9e6b9":[function(require,module,exports) {
+var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
+_parcelHelpers.defineInteropFlag(exports);
+var _parentElement = new WeakMap();
+class RecipeView {
+  constructor() {
+    _parentElement.set(this, {
+      writable: true,
+      value: document.querySelector('.recipe')
+    });
+  }
+}
+exports.default = new RecipeView();
+
+},{"@parcel/transformer-js/lib/esmodule-helpers.js":"5gA8y"}]},["7BONy","3miIZ"], "3miIZ", "parcelRequirefade")
 
 //# sourceMappingURL=index.250b04c7.js.map
