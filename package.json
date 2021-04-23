@@ -1,0 +1,28 @@
+{
+  "name": "forkify",
+  "version": "1.0.0",
+  "description": "Recipe application",
+  "main": "index.html",
+  "scripts": {
+    "start": "parcel index.html",
+    "build": "parcel build index.html"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Dmytro-Lysenko/Forkify.git"
+  },
+  "author": "Dmytro Lysenko",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Dmytro-Lysenko/Forkify/issues"
+  },
+  "homepage": "https://github.com/Dmytro-Lysenko/Forkify#readme",
+  "devDependencies": {
+    "@parcel/transformer-sass": "^2.0.0-beta.2",
+    "parcel": "^2.0.0-beta.2"
+  },
+  "dependencies": {
+    "core-js": "^3.11.0",
+    "regenerator-runtime": "^0.13.7"
+  }
+}
