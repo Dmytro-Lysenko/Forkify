@@ -446,18 +446,10 @@ var _modelJs = require('./model.js');
 var _viewsRecipeViewJs = require('./views/recipeView.js');
 var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
 var _viewsRecipeViewJsDefault = _parcelHelpers.interopDefault(_viewsRecipeViewJs);
+var _viewsSearchViewJs = require('./views/searchView.js');
+var _viewsSearchViewJsDefault = _parcelHelpers.interopDefault(_viewsSearchViewJs);
 require('core-js/stable');
 require('regenerator-runtime/runtime');
-const recipeContainer = document.querySelector('.recipe');
-const timeout = function (s) {
-  return new Promise(function (_, reject) {
-    setTimeout(function () {
-      reject(new Error(`Request took too long! Timeout after ${s} second`));
-    }, s * 1000);
-  });
-};
-// https://forkify-api.herokuapp.com/v2
-// /////////////////////////////////////
 const controlRecipes = async function () {
   try {
     const id = window.location.hash.slice(1);
@@ -473,12 +465,26 @@ const controlRecipes = async function () {
     _viewsRecipeViewJsDefault.default.renderError();
   }
 };
+const controlSearchResults = async function () {
+  try {
+    // 1)Get search query
+    const query = _viewsSearchViewJsDefault.default.getQuery();
+    if (!query) return;
+    // 2)Load search
+    await _modelJs.loadSearchResults(query);
+    // 3) Render results
+    console.log(_modelJs.state.search.results);
+  } catch (err) {
+    console.log(err);
+  }
+};
 const init = function () {
   _viewsRecipeViewJsDefault.default.addHandlerRender(controlRecipes);
+  _viewsSearchViewJsDefault.default.addHandlerSearch(controlSearchResults);
 };
 init();
 
-},{"core-js/stable":"1PFvP","regenerator-runtime/runtime":"62Qib","@parcel/transformer-js/lib/esmodule-helpers.js":"5gA8y","./model.js":"1hp6y","./views/recipeView.js":"9e6b9"}],"1PFvP":[function(require,module,exports) {
+},{"core-js/stable":"1PFvP","regenerator-runtime/runtime":"62Qib","@parcel/transformer-js/lib/esmodule-helpers.js":"5gA8y","./model.js":"1hp6y","./views/recipeView.js":"9e6b9","./views/searchView.js":"3rYQ6"}],"1PFvP":[function(require,module,exports) {
 require('../modules/es.symbol');
 require('../modules/es.symbol.description');
 require('../modules/es.symbol.async-iterator');
@@ -12440,15 +12446,22 @@ _parcelHelpers.export(exports, "state", function () {
 _parcelHelpers.export(exports, "loadRecipe", function () {
   return loadRecipe;
 });
+_parcelHelpers.export(exports, "loadSearchResults", function () {
+  return loadSearchResults;
+});
 require('regenerator-runtime');
 var _configJs = require('./config.js');
 var _helpersJs = require('./helpers.js');
 const state = {
-  recipe: {}
+  recipe: {},
+  search: {
+    query: '',
+    results: []
+  }
 };
 const loadRecipe = async function (id) {
   try {
-    const data = await _helpersJs.getJSON(`${_configJs.API_URL}/${id}`);
+    const data = await _helpersJs.getJSON(`${_configJs.API_URL}${id}`);
     const {recipe} = data.data;
     state.recipe = {
       id: recipe.id,
@@ -12466,6 +12479,25 @@ const loadRecipe = async function (id) {
     throw err;
   }
 };
+const loadSearchResults = async function (query) {
+  try {
+    state.search.query = query;
+    const data = await _helpersJs.getJSON(`${_configJs.API_URL}?search=${query}`);
+    console.log(data);
+    state.search.results = data.data.recipes.map(rec => {
+      return {
+        id: rec.id,
+        title: rec.title,
+        publisher: rec.publisher,
+        image: rec.image_url
+      };
+    });
+    console.log(state.search.results);
+  } catch (err) {
+    console.error(`${err}0000`);
+    throw err;
+  }
+};
 
 },{"regenerator-runtime":"62Qib","./config.js":"6pr2F","./helpers.js":"581KF","@parcel/transformer-js/lib/esmodule-helpers.js":"5gA8y"}],"6pr2F":[function(require,module,exports) {
 var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
@@ -12476,7 +12508,7 @@ _parcelHelpers.export(exports, "API_URL", function () {
 _parcelHelpers.export(exports, "TIMEOUT_SEC", function () {
   return TIMEOUT_SEC;
 });
-const API_URL = 'https://forkify-api.herokuapp.com/api/v2/recipes';
+const API_URL = 'https://forkify-api.herokuapp.com/api/v2/recipes/';
 const TIMEOUT_SEC = 10;
 
 },{"@parcel/transformer-js/lib/esmodule-helpers.js":"5gA8y"}],"581KF":[function(require,module,exports) {
@@ -12582,7 +12614,6 @@ class RecipeView {
   }
   render(data) {
     _classPrivateFieldSet(this, _data, data);
-    console.log(data);
     // console.log(this.#data);
     const markup = _classPrivateMethodGet(this, _generateMarkup, _generateMarkup2).call(this);
     _classPrivateMethodGet(this, _clear, _clear2).call(this);
@@ -13142,6 +13173,58 @@ Fraction.primeFactors = function(n)
 
 module.exports.Fraction = Fraction
 
-},{}]},["7BONy","3miIZ"], "3miIZ", "parcelRequirefade")
+},{}],"3rYQ6":[function(require,module,exports) {
+var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
+_parcelHelpers.defineInteropFlag(exports);
+function _classPrivateMethodGet(receiver, privateSet, fn) {
+  if (!privateSet.has(receiver)) {
+    throw new TypeError("attempted to get private field on non-instance");
+  }
+  return fn;
+}
+function _classPrivateFieldGet(receiver, privateMap) {
+  var descriptor = _classExtractFieldDescriptor(receiver, privateMap, "get");
+  return _classApplyDescriptorGet(receiver, descriptor);
+}
+function _classExtractFieldDescriptor(receiver, privateMap, action) {
+  if (!privateMap.has(receiver)) {
+    throw new TypeError("attempted to " + action + " private field on non-instance");
+  }
+  return privateMap.get(receiver);
+}
+function _classApplyDescriptorGet(receiver, descriptor) {
+  if (descriptor.get) {
+    return descriptor.get.call(receiver);
+  }
+  return descriptor.value;
+}
+var _parentEl = new WeakMap();
+var _clearInput = new WeakSet();
+class SearchView {
+  constructor() {
+    _clearInput.add(this);
+    _parentEl.set(this, {
+      writable: true,
+      value: document.querySelector('.search')
+    });
+  }
+  getQuery() {
+    const query = _classPrivateFieldGet(this, _parentEl).querySelector('.search__field').value;
+    _classPrivateMethodGet(this, _clearInput, _clearInput2).call(this);
+    return query;
+  }
+  addHandlerSearch(handler) {
+    _classPrivateFieldGet(this, _parentEl).addEventListener('submit', function (e) {
+      e.preventDefault();
+      handler();
+    });
+  }
+}
+function _clearInput2() {
+  _classPrivateFieldGet(this, _parentEl).querySelector('.search__field').value = '';
+}
+exports.default = new SearchView();
+
+},{"@parcel/transformer-js/lib/esmodule-helpers.js":"5gA8y"}]},["7BONy","3miIZ"], "3miIZ", "parcelRequirefade")
 
 //# sourceMappingURL=index.250b04c7.js.map

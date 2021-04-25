@@ -10,7 +10,7 @@ class RecipeView {
   #message = '';
   render(data) {
     this.#data = data;
-    console.log(data);
+
     // console.log(this.#data);
     const markup = this.#generateMarkup();
     this.#clear();
