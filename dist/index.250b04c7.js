@@ -452,9 +452,9 @@ var _viewsResultsViewJs = require('./views/resultsView.js');
 var _viewsResultsViewJsDefault = _parcelHelpers.interopDefault(_viewsResultsViewJs);
 require('core-js/stable');
 require('regenerator-runtime/runtime');
-if (module.hot) {
-  module.hot.accept();
-}
+// if (module.hot) {
+// module.hot.accept();
+// }
 const controlRecipes = async function () {
   try {
     const id = window.location.hash.slice(1);
@@ -479,7 +479,9 @@ const controlSearchResults = async function () {
     // 2)Load search
     await _modelJs.loadSearchResults(query);
     // 3) Render results
-    _viewsResultsViewJsDefault.default.render(_modelJs.state.search.results);
+    // resultsView.render(model.state.search.results);
+    // console.log(model.getSearchResultsPage(1));
+    _viewsResultsViewJsDefault.default.render(_modelJs.getSearchResultsPage(3));
   } catch (err) {
     console.log(err);
   }
@@ -12455,6 +12457,9 @@ _parcelHelpers.export(exports, "loadRecipe", function () {
 _parcelHelpers.export(exports, "loadSearchResults", function () {
   return loadSearchResults;
 });
+_parcelHelpers.export(exports, "getSearchResultsPage", function () {
+  return getSearchResultsPage;
+});
 require('regenerator-runtime');
 var _configJs = require('./config.js');
 var _helpersJs = require('./helpers.js');
@@ -12462,7 +12467,9 @@ const state = {
   recipe: {},
   search: {
     query: '',
-    results: []
+    results: [],
+    page: 1,
+    resultsPerPage: _configJs.RES_PER_PAGE
   }
 };
 const loadRecipe = async function (id) {
@@ -12504,6 +12511,12 @@ const loadSearchResults = async function (query) {
     throw err;
   }
 };
+const getSearchResultsPage = function (page = state.search.page) {
+  state.search.page = page;
+  const start = (page - 1) * state.search.resultsPerPage;
+  const end = page * state.search.resultsPerPage;
+  return state.search.results.slice(start, end);
+};
 
 },{"regenerator-runtime":"62Qib","./config.js":"6pr2F","./helpers.js":"581KF","@parcel/transformer-js/lib/esmodule-helpers.js":"5gA8y"}],"6pr2F":[function(require,module,exports) {
 var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
@@ -12514,8 +12527,12 @@ _parcelHelpers.export(exports, "API_URL", function () {
 _parcelHelpers.export(exports, "TIMEOUT_SEC", function () {
   return TIMEOUT_SEC;
 });
+_parcelHelpers.export(exports, "RES_PER_PAGE", function () {
+  return RES_PER_PAGE;
+});
 const API_URL = 'https://forkify-api.herokuapp.com/api/v2/recipes/';
 const TIMEOUT_SEC = 10;
+const RES_PER_PAGE = 10;
 
 },{"@parcel/transformer-js/lib/esmodule-helpers.js":"5gA8y"}],"581KF":[function(require,module,exports) {
 var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
@@ -13237,7 +13254,7 @@ class ResultsView extends _ViewJsDefault.default {
               <div class="preview__data">
                 <h4 class="preview__title">${result.title}</h4>
                 <p class="preview__publisher">${result.publisher}</p>
-               
+               </div>
             </a>
         </li>
     `;
