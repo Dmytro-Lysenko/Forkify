@@ -1,13 +1,15 @@
 // import icons from '../img/icons.svg'; //Parcel 1
 import icons from 'url:../../img/icons.svg'; //Parcel 2
 import { Fraction } from 'fractional';
-console.log(Fraction);
+// console.log(Fraction);
 
 class RecipeView {
   #parentElement = document.querySelector('.recipe');
   #data;
   render(data) {
     this.#data = data;
+    console.log(data);
+    // console.log(this.#data);
     const markup = this.#generateMarkup();
     this.#clear();
     this.#parentElement.insertAdjacentHTML('afterbegin', markup);
